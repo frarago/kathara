@@ -1,0 +1,4 @@
+#!/bin/bash
+ip addr add 7.7.7.7/25 dev eth0
+ip link set eth0 up
+ip route add default via 7.7.7.1
