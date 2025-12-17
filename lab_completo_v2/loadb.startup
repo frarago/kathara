@@ -1,0 +1,16 @@
+# IP reale + VIP lato esterno (rete 9.9.9.0/24)
+ip address add 9.9.9.2/24 dev eth0
+ip address add 9.9.9.9/32 dev eth0
+
+# LAN customer (VLAN10 su VXLAN VNI5010)
+ip address add 192.168.10.1/24 dev eth1
+
+# Default route verso as9r1
+ip route add default via 9.9.9.1
+
+# DNAT random verso i due web server
+iptables-legacy -t nat -A PREROUTING -d 9.9.9.9 -p tcp --dport 80   -m statistic --mode random --probability 0.5 -j DNAT --to-destination 192.168.10.2:80
+iptables-legacy -t nat -A PREROUTING -d 9.9.9.9 -p tcp --dport 80   -j DNAT --to-destination 192.168.10.3:80
+
+# Masquerade come nello script della traccia
+iptables-legacy -t nat -A POSTROUTING -o eth0 -j MASQUERADE
